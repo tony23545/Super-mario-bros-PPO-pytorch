@@ -124,6 +124,7 @@ def train(opt):
         R = R[::-1]
         R = torch.cat(R).detach()
         advantages = R - values
+        epoch_loss = 0
         for i in range(opt.num_epochs):
             indice = torch.randperm(opt.num_local_steps * opt.num_processes)
             for j in range(opt.batch_size):
@@ -147,7 +148,8 @@ def train(opt):
                 total_loss.backward()
                 torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
                 optimizer.step()
-        print("Episode: {}. Total loss: {}".format(curr_episode, total_loss))
+                epoch_loss += total_loss.detach()
+        print("Episode: {}. Total loss: {}".format(curr_episode, epoch_loss / (opt.num_epochs * opt.batch_size)))
 
 
 if __name__ == "__main__":
