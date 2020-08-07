@@ -10,7 +10,7 @@ from src.env import create_train_env
 from src.model import PPO
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT, COMPLEX_MOVEMENT, RIGHT_ONLY
 import torch.nn.functional as F
-
+import time
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -55,6 +55,7 @@ def test(opt):
         state, reward, done, info = env.step(action)
         state = torch.from_numpy(state)
         env.render()
+        time.sleep(0.05)
         if info["flag_get"]:
             print("World {} stage {} completed".format(opt.world, opt.stage))
             break

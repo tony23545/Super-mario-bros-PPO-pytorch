@@ -37,6 +37,7 @@ def get_args():
     parser.add_argument("--max_actions", type=int, default=200, help="Maximum repetition steps in test phase")
     parser.add_argument("--log_path", type=str, default="tensorboard/ppo_super_mario_bros")
     parser.add_argument("--saved_path", type=str, default="trained_models")
+    parser.add_argument("--load", type=bool, default=False)
     args = parser.parse_args()
     return args
 
@@ -57,6 +58,9 @@ def train(opt):
     if torch.cuda.is_available():
         model.cuda()
     model.share_memory()
+    MODEL_PATH = "{}/ppo_super_mario_bros_{}_{}".format(opt.saved_path, opt.world, opt.stage)
+    if opt.load:
+        model.load_state_dict(torch.load(MODEL_PATH))
     process = mp.Process(target=eval, args=(opt, model, envs.num_states, envs.num_actions))
     process.start()
     optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr)
@@ -68,11 +72,12 @@ def train(opt):
     curr_episode = 0
     while True:
         if curr_episode % opt.save_interval == 0 and curr_episode > 0:
-            print("save mode to {}/ppo_super_mario_bros_{}_{}".format(opt.saved_path, opt.world, opt.stage))
-            torch.save(model.state_dict(),
-                       "{}/ppo_super_mario_bros_{}_{}".format(opt.saved_path, opt.world, opt.stage))
+            print(MODEL_PATH)
+            torch.save(model.state_dict(), MODEL_PATH)
         #     torch.save(model.state_dict(),
         #                "{}/ppo_super_mario_bros_{}_{}_{}".format(opt.saved_path, opt.world, opt.stage, curr_episode))
+        if curr_episode > 300:
+            break
         curr_episode += 1
         old_log_policies = []
         actions = []
