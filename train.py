@@ -67,9 +67,10 @@ def train(opt):
         curr_states = curr_states.cuda()
     curr_episode = 0
     while True:
-        # if curr_episode % opt.save_interval == 0 and curr_episode > 0:
-        #     torch.save(model.state_dict(),
-        #                "{}/ppo_super_mario_bros_{}_{}".format(opt.saved_path, opt.world, opt.stage))
+        if curr_episode % opt.save_interval == 0 and curr_episode > 0:
+            print("save mode to {}/ppo_super_mario_bros_{}_{}".format(opt.saved_path, opt.world, opt.stage))
+            torch.save(model.state_dict(),
+                       "{}/ppo_super_mario_bros_{}_{}".format(opt.saved_path, opt.world, opt.stage))
         #     torch.save(model.state_dict(),
         #                "{}/ppo_super_mario_bros_{}_{}_{}".format(opt.saved_path, opt.world, opt.stage, curr_episode))
         curr_episode += 1
